@@ -6,7 +6,9 @@ checkpoints*
 log
 generated
 data
+datasets
 text
+*.npy
 
 # Created by https://www.gitignore.io
 
