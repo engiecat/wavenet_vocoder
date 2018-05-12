@@ -122,6 +122,20 @@ hparams = tf.contrib.training.HParams(
     save_optimizer_state=True,
 
     # Eval:
+    
+    # json_meta related:
+    # 0: "use all",
+    # 1: "ignore only unmatched_alignment",
+    # 2: "fully ignore recognition",
+    ignore_recognition_level=2,
+    # when dealing with non-dedicated speech dataset(e.g. movie excerpts), setting min_text above 15 is desirable. Can be adjusted by dataset.
+    min_text=20,
+    # if true, data without phoneme alignment file(.lab) will be ignored
+    process_only_htk_aligned=False,
+    max_audio_length=0, # in seconds, inactive when 0. (After preprocessing)
+    min_audio_length=0, # in seconds, inactive when 0. (After preprocessing)
+    # Based on HTK-styled phoneme alignment
+    max_silence_length=0, # in seconds, inactive when 0, 
 )
 
 

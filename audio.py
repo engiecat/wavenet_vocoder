@@ -9,6 +9,11 @@ from scipy.io import wavfile
 import lws
 
 
+def set_hparams(param):
+    global hparams
+    hparams=param
+	
+
 def load_wav(path):
     return librosa.core.load(path, sr=hparams.sample_rate)[0]
 
