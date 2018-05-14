@@ -59,6 +59,7 @@ from wavenet_vocoder.mixture import sample_from_discretized_mix_logistic
 
 import audio
 from hparams import hparams, hparams_debug_string
+from functools import partial
 
 fs = hparams.sample_rate
 
@@ -351,7 +352,7 @@ def assert_ready_for_upsampling(x, c):
     assert len(x) % len(c) == 0 and len(x) // len(c) == audio.get_hop_size()
 
 
-def collate_fn(batch):
+def collate_fn_preset_not_applied(batch, hparams=hparams):
     """Create batch
 
     Args:
@@ -884,6 +885,8 @@ def get_data_loaders(data_root, speaker_id, test_shuffle=True):
             shuffle = test_shuffle
 
         dataset = PyTorchDataset(X, Mel)
+        # Due to Issue #63
+        collate_fn = partial(collate_fn_preset_not_applied, hparams=hparams)
         data_loader = data_utils.DataLoader(
             dataset, batch_size=hparams.batch_size,
             num_workers=hparams.num_workers, sampler=sampler, shuffle=shuffle,
