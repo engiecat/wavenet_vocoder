@@ -61,8 +61,6 @@ import audio
 from hparams import hparams, hparams_debug_string
 from functools import partial
 
-fs = hparams.sample_rate
-
 global_step = 0
 global_test_step = 0
 global_epoch = 0
@@ -496,7 +494,10 @@ def eval_model(global_step, writer, device, model, y, c, g, input_lengths, eval_
     y_target = y[idx].view(-1).data.cpu().numpy()[:length]
 
     if c is not None:
-        c = c[idx, :, :length].unsqueeze(0)
+        if hparams.upsample_conditional_features:
+            c = c[idx, :, :length // audio.get_hop_size()].unsqueeze(0)
+        else:
+            c = c[idx, :, :length].unsqueeze(0)
         assert c.dim() == 3
         print("Shape of local conditioning features: {}".format(c.size()))
     if g is not None:
@@ -932,6 +933,8 @@ if __name__ == "__main__":
     hparams.parse(args["--hparams"])
     assert hparams.name == "wavenet_vocoder"
     print(hparams_debug_string())
+    
+    fs = hparams.sample_rate
 
     os.makedirs(checkpoint_dir, exist_ok=True)
 

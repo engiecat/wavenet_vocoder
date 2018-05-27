@@ -19,6 +19,7 @@ A notebook supposed to be executed on https://colab.research.google.com is avail
 - Focus on local and global conditioning of WaveNet, which is essential for vocoder.
 - Mixture of logistic distributions loss / sampling
 - Various audio samples and pre-trained models
+- Fast inference by caching intermediate states in convolutions. Similar to [arXiv:1611.09482](https://arxiv.org/abs/1611.09482)
 
 ## Pre-trained models
 
@@ -40,13 +41,15 @@ And then follows "Synthesize from a checkpoint" section in the README. Note that
 You could try for example:
 
 ```
-# Assuming you have downloaded LJSpeech-1.0 at ~/data/LJSpeech-1.0
-# pretrained model (20180127_mixture_lj_checkpoint_step000410000_ema.pth)
-git checkout 489e6fa
-python preprocess.py ljspeech ~/data/LJSpeech-1.0 ./data/ljspeech
-python synthesis.py --hparams="input_type=raw,quantize_channels=65536,out_channels=30" \
+# Assuming you have downloaded LJSpeech-1.1 at ~/data/LJSpeech-1.1
+# pretrained model (20180510_mixture_lj_checkpoint_step000320000_ema.pth)
+# hparams (20180510_mixture_lj_checkpoint_step000320000_ema.json)
+git checkout 2092a64
+python preprocess.py ljspeech ~/data/LJSpeech-1.1 ./data/ljspeech \
+  --preset=20180510_mixture_lj_checkpoint_step000320000_ema.json
+python synthesis.py --preset=20180510_mixture_lj_checkpoint_step000320000_ema.json \
   --conditional=./data/ljspeech/ljspeech-mel-00001.npy \
-  20180127_mixture_lj_checkpoint_step000410000_ema.pth \
+  20180510_mixture_lj_checkpoint_step000320000_ema.pth \
   generated
 ```
 
@@ -64,8 +67,7 @@ You can find a generated wav file in `generated` directory. Wonder how it works?
 The repository contains a core library (PyTorch implementation of the WaveNet) and utility scripts. All the library and its dependencies can be installed by:
 
 ```
-git clone https://github.com/r9y9/wavenet_vocoder
-cd wavenet_vocoder
+git clone https://github.com/r9y9/wavenet_vocoder && cd wavenet_vocoder
 pip install -e ".[train]"
 ```
 
@@ -217,7 +219,7 @@ Usage:
 
 ```
 python evaluate.py ${checkpoint_path} ${output_dir} --data-root="data location"\
-    --hparams="parameters you want to override"
+    --preset=<json> --hparams="parameters you want to override"
 ```
 
 This script is used for generating sounds for https://r9y9.github.io/wavenet_vocoder/.
@@ -242,3 +244,4 @@ python evaluate.py --data-root=./data/cmu_arctic/ \
 - [Tamamori, Akira, et al. "Speaker-dependent WaveNet vocoder." Proceedings of Interspeech. 2017.](http://www.isca-speech.org/archive/Interspeech_2017/pdfs/0314.PDF)
 - [Jonathan Shen, Ruoming Pang, Ron J. Weiss, et al, "Natural TTS Synthesis by Conditioning WaveNet on Mel Spectrogram Predictions", arXiv:1712.05884, Dec 2017.](https://arxiv.org/abs/1712.05884)
 - [Wei Ping, Kainan Peng, Andrew Gibiansky, et al, "Deep Voice 3: 2000-Speaker Neural Text-to-Speech", arXiv:1710.07654, Oct. 2017.](https://arxiv.org/abs/1710.07654)
+- [Tom Le Paine, Pooya Khorrami, Shiyu Chang, et al, "Fast Wavenet Generation Algorithm", arXiv:1611.09482, Nov. 2016](https://arxiv.org/abs/1611.09482)
