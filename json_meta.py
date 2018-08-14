@@ -44,14 +44,20 @@ import librosa
 import json
 
 from wavenet_vocoder.util import is_mulaw_quantize, is_mulaw, is_raw
-
+from os import listdir
+from os.path import isfile, join, isdir, splitext
 
 def build_from_path(in_dir, out_dir, num_workers=1, tqdm=lambda x: x):
     executor = ProcessPoolExecutor(max_workers=num_workers)
     futures = []
-    
-    json_paths = in_dir.split(',')
-    json_paths = [json_path.replace("'", "").replace('"',"") for json_path in json_paths]
+    if isdir(in_dir):
+        json_paths = [join(in_dir, f) for f in listdir(in_dir) if isfile(join(in_dir, f)) and splitext(join(in_dir,f))[1] == '.json']
+        json_paths.sort()
+        print("===============FOLDER BATCH MODE ===================")
+        
+    else:
+        json_paths = in_dir.split(',')
+        json_paths = [json_path.replace("'", "").replace('"',"") for json_path in json_paths]
     num_speakers = len(json_paths)
     is_aligned = {}
     
