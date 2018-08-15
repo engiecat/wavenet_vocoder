@@ -81,10 +81,7 @@ if __name__ == "__main__":
 
     # Load checkpoint
     print("Load checkpoint from {}".format(checkpoint_path))
-    if use_cuda:
-        checkpoint = torch.load(checkpoint_path)
-    else:
-        checkpoint = torch.load(checkpoint_path, map_location=lambda storage, loc: storage)
+    checkpoint = torch.load(checkpoint_path)
     model.load_state_dict(checkpoint["state_dict"])
     checkpoint_name = splitext(basename(checkpoint_path))[0]
 
@@ -94,7 +91,7 @@ if __name__ == "__main__":
     generated_utterances = {}
     for idx, (x, c, g) in enumerate(test_dataset):
         target_audio_path = test_dataset.X.collected_files[idx][0]
-        if g is None and num_utterances > 0 and idx > num_utterances:
+        if g is None and num_utterances > idx:
             break
         if num_utterances > 0 and g is not None:
             try:
